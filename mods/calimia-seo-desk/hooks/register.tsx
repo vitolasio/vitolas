@@ -41,7 +41,7 @@ import {
 type Engine = EngineInterface
 
 const PANE = 'seo-desk'
-const MAX_ROWS = 800
+const MAX_ROWS = 2500
 const FULL_SCAN_EVERY_MS = 7 * 24 * 3600 * 1000
 
 const NO_TOTALS: SeoTotals = {
@@ -602,6 +602,20 @@ async function rowAlt($: Engine, r: SeoRow): Promise<void> {
   if (item !== undefined) await sendAlt($, [item])
 }
 
+/** Opens the listing in Shopify admin in the browser; copies the link where that fails. */
+async function openAdmin($: Engine, r: SeoRow): Promise<void> {
+  const url = adminUrl(r.kind, r.id)
+  for (const opener of ['open', 'xdg-open']) {
+    try {
+      if ((await $.process.run([opener, url])).exitCode === 0) return
+    } catch {
+      // not this platform's opener; try the next
+    }
+  }
+  await $.ui.copy({ text: url })
+  $.ui.toast('Shopify link copied to the clipboard.')
+}
+
 async function setFilter($: Engine, filter: SeoFilter): Promise<void> {
   await update($, ui, () => ({ filter, page: 0 }))
 }
@@ -704,7 +718,7 @@ export const register: Register = (on, options) => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Button, Link, Text } = $.ui.resolve(e)
+    const { Box, Button, Text } = $.ui.resolve(e)
     const v = await read($, view)
     const fixes = await read($, pending)
     const u = await read($, ui)
@@ -767,7 +781,7 @@ export const register: Register = (on, options) => {
                   <Button key={`files-${r.kind}-${r.id}`} label="Files" onPress={() => void rowFiles($, r)} />
                 )}
                 {r.groups.includes('alt') && <Button key={`alt-${r.kind}-${r.id}`} label="Alt" onPress={() => void rowAlt($, r)} />}
-                <Link key={`open-${r.kind}-${r.id}`} href={adminUrl(r.kind, r.id)} label="Open" />
+                <Button key={`open-${r.kind}-${r.id}`} label="Open" onPress={() => void openAdmin($, r)} />
                 <Text dimColor wrap="truncate-end">
                   {r.summary}
                 </Text>

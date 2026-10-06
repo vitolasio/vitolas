@@ -65,6 +65,6 @@ pasted into a description by URL must be updated by hand (the pane warns before 
 
 ## Develop
 
-`claude plugin validate .` and `claude plugin test .` (16 tests: rules, plus the pane and
+`claude plugin validate .` and `claude plugin test .` (17 tests: rules, plus the pane and
 banner driven end to end against a stubbed Shopify on terminal and desktop).
 `hooks/rules.ts` holds every rule and threshold.

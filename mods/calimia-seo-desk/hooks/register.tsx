@@ -167,6 +167,15 @@ function report(v: SeoView): string {
 
 type Json = Record<string, any>
 
+// Products per page: about 1,500 characters each with their images, so 15 stays well
+// under the size Claude Code allows one tool result; halved on the rare page that is not.
+const PAGE_START = 15
+const PAGE_MIN = 2
+
+function isTooLarge(err: unknown): boolean {
+  return err instanceof Error && /exceeds maximum allowed tokens|too large|output has been saved/i.test(err.message)
+}
+
 async function gql($: Engine, tool: 'graphql_query' | 'graphql_mutation', query: string, variables: Json): Promise<Json> {
   const args: Json = { query, variables }
   if (tool === 'graphql_query' && typeof variables.first === 'number') {
@@ -181,10 +190,19 @@ async function gql($: Engine, tool: 'graphql_query' | 'graphql_mutation', query:
 async function scanProducts($: Engine, since: string | null): Promise<Item[]> {
   const out: Item[] = []
   let after: string | null = null
-  for (let page = 0; page < 200; page += 1) {
-    const vars: Json = { first: 40, query: productFilter(since) }
+  let size = PAGE_START
+  for (let page = 0; page < 1000; page += 1) {
+    const vars: Json = { first: size, query: productFilter(since) }
     if (after !== null) vars.after = after
-    const conn = (await gql($, 'graphql_query', PRODUCTS, vars)).products
+    let conn: Json
+    try {
+      conn = (await gql($, 'graphql_query', PRODUCTS, vars)).products
+    } catch (err) {
+      // Claude Code caps one tool result; a page of image-heavy products can pass it.
+      if (!isTooLarge(err) || size <= PAGE_MIN) throw err
+      size = Math.max(PAGE_MIN, Math.floor(size / 2))
+      continue
+    }
     for (const node of conn?.nodes ?? []) out.push(productItem(node))
     if (since === null) await setBusy($, `Scanning products… ${fmt(out.length)}`)
     if (!conn?.pageInfo?.hasNextPage) break
@@ -196,10 +214,18 @@ async function scanProducts($: Engine, since: string | null): Promise<Item[]> {
 async function scanCollections($: Engine): Promise<Item[]> {
   const out: Item[] = []
   let after: string | null = null
-  for (let page = 0; page < 50; page += 1) {
-    const vars: Json = { first: 50 }
+  let size = 25
+  for (let page = 0; page < 200; page += 1) {
+    const vars: Json = { first: size }
     if (after !== null) vars.after = after
-    const conn = (await gql($, 'graphql_query', COLLECTIONS, vars)).collections
+    let conn: Json
+    try {
+      conn = (await gql($, 'graphql_query', COLLECTIONS, vars)).collections
+    } catch (err) {
+      if (!isTooLarge(err) || size <= PAGE_MIN) throw err
+      size = Math.max(PAGE_MIN, Math.floor(size / 2))
+      continue
+    }
     for (const node of conn?.nodes ?? []) out.push(collectionItem(node))
     if (!conn?.pageInfo?.hasNextPage) break
     after = conn.pageInfo.endCursor

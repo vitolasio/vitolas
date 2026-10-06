@@ -153,3 +153,27 @@ for (const surface of ['terminal', 'desktop'] as const) {
     await pane.unmount()
   })
 }
+
+test('a page too large for one tool result is fetched again in smaller pages', { timeoutMs: 20000 }, async ($, on) => {
+  mock.clock(on, { now: Date.parse('2026-10-06T12:00:00Z') })
+  mock.store(on)
+  const firsts: number[] = []
+  on('mcp.call', async ($, e) => {
+    const query = String(e.args.query ?? '')
+    if (query.includes('products(')) {
+      const first = Number((e.args.variables as Record<string, unknown>).first)
+      firsts.push(first)
+      if (first > 5) {
+        return { value: { content: [{ type: 'text', text: 'Error: result (57,911 characters) exceeds maximum allowed tokens. Output has been saved to /tmp/x.txt' }], isError: false } }
+      }
+      return textResult(PRODUCTS)
+    }
+    return textResult({ data: { collections: { pageInfo: { hasNextPage: false }, nodes: [] } } })
+  })
+
+  const pane = await $.ui.mount({ plugin: 'calimia-seo-desk', surface: 'terminal', component: 'Pane', requestId: 'seo-desk', props: PANE_PROPS as never })
+  await pane.press({ key: 'rescan' })
+  expect(firsts).toEqual([15, 7, 3])
+  expect(await pane.find({ text: /Astrid Toiletry Bag/ })).toBeDefined()
+  await pane.unmount()
+})

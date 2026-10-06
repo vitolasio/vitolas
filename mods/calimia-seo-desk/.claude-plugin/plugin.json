@@ -1,0 +1,64 @@
+{
+  "name": "calimia-seo-desk",
+  "version": "0.1.0",
+  "description": "Calimia Home SEO Desk: scores every Shopify product and collection, fixes meta titles, meta descriptions, image file names and alt text with your approval, and flags new products that need SEO.",
+  "author": {
+    "name": "Calimia Home",
+    "email": "shop@calimiahome.com"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "shopifyServer": {
+      "type": "string",
+      "title": "Shopify MCP server",
+      "description": "The Shopify connector's name as /mcp lists it.",
+      "default": "claude.ai Shopify"
+    },
+    "adminStore": {
+      "type": "string",
+      "title": "Shopify admin store handle",
+      "description": "The part after /store/ in your Shopify admin URL, for the Open links.",
+      "default": "1ba31e-2"
+    },
+    "titleFormat": {
+      "type": "string",
+      "title": "SEO title format",
+      "description": "product-vendor-brand: 'Product | Vendor | Calimia Home'; product-brand: 'Product | Calimia Home'. Parts are dropped to fit 60 characters.",
+      "options": [
+        "product-vendor-brand",
+        "product-brand"
+      ],
+      "default": "product-vendor-brand"
+    },
+    "metaModel": {
+      "type": "string",
+      "title": "Model for meta descriptions",
+      "description": "Alias or model id used to write meta descriptions.",
+      "default": "haiku"
+    },
+    "rescanMinutes": {
+      "type": "number",
+      "title": "Minutes between change checks",
+      "description": "How often the open session checks Shopify for changed products (10 or more).",
+      "default": 60
+    },
+    "newDays": {
+      "type": "number",
+      "title": "Days a product counts as new",
+      "description": "New products with SEO issues are listed first and raise the banner.",
+      "default": 14
+    },
+    "renameFiles": {
+      "type": "boolean",
+      "title": "Offer file renames",
+      "description": "Offer to rename hash and screenshot image file names to the product handle.",
+      "default": true
+    },
+    "houseRulesInPrompt": {
+      "type": "boolean",
+      "title": "Teach Claude the house SEO rules",
+      "description": "Add the Calimia SEO house rules to Claude's system prompt so products Claude writes follow them.",
+      "default": true
+    }
+  }
+}

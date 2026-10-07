@@ -135,10 +135,9 @@ open `/orders`, read the waiting updates, then **Apply**.
 
 ## Your nightly agent
 
-The midnight agent that creates order tasks keeps working. Add this line to its prompt so
-the two never make the same task twice:
-
-> Skip any order that already has a task in Shopify Web Orders whose name contains its order number (e.g. "#2282").
+Keep it as the overnight and weekend backstop, with the narrower prompt in
+`routines/nightly-orders.md`: it only creates missing tasks (with its detailed notes),
+never duplicates one, and leaves moving tasks to the Order Desk and the team.
 
 ## Settings (`/config` → calimia-order-desk)
 

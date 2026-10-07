@@ -1,0 +1,24 @@
+{
+  "name": "calimia-order-desk",
+  "version": "0.1.0",
+  "description": "Calimia Home Order Desk: one board for web, POS and draft-order sales from quote to delivery, kept in sync with the Shopify Web Orders Asana project, with late-order alerts, Gmail drafts and guards on order-changing actions.",
+  "author": { "name": "Calimia Home", "email": "shop@calimiahome.com" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "shopifyServer": { "type": "string", "title": "Shopify MCP server", "description": "The Shopify connector's name as /mcp lists it.", "default": "claude.ai Shopify" },
+    "asanaServer": { "type": "string", "title": "Asana MCP server", "description": "The Asana connector's name as /mcp lists it.", "default": "claude.ai Asana" },
+    "gmailServer": { "type": "string", "title": "Gmail MCP server", "description": "The Gmail connector's name as /mcp lists it.", "default": "claude.ai Gmail" },
+    "asanaProject": { "type": "string", "title": "Asana project GID", "description": "The orders project (Shopify Web Orders).", "default": "1215125736009076" },
+    "adminStore": { "type": "string", "title": "Shopify admin store handle", "description": "The part after /store/ in your Shopify admin URL.", "default": "1ba31e-2" },
+    "assignee": { "type": "string", "title": "Default assignee", "description": "Email of the person new order tasks are assigned to.", "default": "gustaf@calimiahome.com" },
+    "shipSlaDays": { "type": "number", "title": "Ship within (business days)", "description": "A paid order not shipped or in production after this many business days is late.", "default": 3 },
+    "invoiceReminderDays": { "type": "number", "title": "Invoice reminder after (days)", "description": "A sent draft-order invoice unpaid this long is flagged.", "default": 3 },
+    "pickupReminderDays": { "type": "number", "title": "Pickup reminder after (days)", "description": "An order ready for pickup this long is flagged.", "default": 7 },
+    "syncMinutes": { "type": "number", "title": "Minutes between syncs", "description": "How often the open session syncs Shopify and Asana (5 or more).", "default": 15 },
+    "lookbackDays": { "type": "number", "title": "Days of orders to watch", "description": "Orders from this many days back, plus every unfulfilled order.", "default": 30 },
+    "completeDeliveredAfterDays": { "type": "number", "title": "Complete delivered tasks after (days)", "description": "0 leaves delivered tasks open.", "default": 14 },
+    "createTasks": { "type": "boolean", "title": "Create Asana tasks", "description": "Create tasks for new paid orders, and for sent quotes when the project has a Quotes section.", "default": true },
+    "autoSync": { "type": "boolean", "title": "Update Asana automatically", "description": "Off: the board lists the updates for you to apply.", "default": true },
+    "guards": { "type": "boolean", "title": "Ask before order-changing actions", "description": "Ask before Claude marks a draft paid, cancels, refunds or fulfills an order, or sends an email.", "default": true }
+  }
+}

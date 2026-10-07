@@ -8,7 +8,7 @@ Start a local session in `~/vitolas` and say: "Read HANDOFF.md and continue."
 | --- | --- | --- |
 | **SEO Desk** mod (`/seo`) | `mods/calimia-seo-desk/` | Running on Gustaf's Mac. First scan done: score 93, 1,072 images without alt, 606 meta issues, 197 bad file names, 28 new products (Maison Poire batch first). No fixes applied yet. |
 | **Order Desk** mod (`/orders`, `/order #1234`) | `mods/calimia-order-desk/` | Built, 24 tests pass, dry-run checked against live data. **Not yet run in Claude Code.** |
-| **Nightly order tasks** cloud Routine | claude.ai/code → Routines, `trig_014GEM4t4uueBSmdoiqcKYxz` | Midnight ET, fresh session each run. Creates only missing tasks; never moves tasks. Prompt also in `mods/calimia-order-desk/routines/nightly-orders.md`. |
+| **Nightly order tasks** cloud Routine | claude.ai/code → Routines, `trig_014GEM4t4uueBSmdoiqcKYxz` | Midnight ET, fresh session each run. Creates only missing tasks; never moves tasks. **Not working yet: no connectors** (see item 1). Prompt in `mods/calimia-order-desk/routines/nightly-orders.md`. |
 
 Each mod's README has the full design: `mods/calimia-seo-desk/README.md`, `mods/calimia-order-desk/README.md`.
 
@@ -20,10 +20,15 @@ Develop: in a mod folder, `claude plugin validate .` and `claude plugin test .`.
 
 ## Open items, in order
 
-1. **Confirm the cloud Routine has Shopify + Asana connectors.** A manual test run was fired on
-   7 Oct (~10:55 am ET). Check the comment it left on the Asana task "Notes" (in Shopify Web
-   Orders): "Test run …: created N tasks". If it says connectors were missing, open the Routine
-   in claude.ai/code → Routines, attach Shopify and Asana, save, and fire it again.
+1. **Give the cloud Routine its connectors.** The test run on 7 Oct (~10:55 am ET) stopped
+   safely without touching anything: Shopify and Asana are connected on the account but
+   switched off for the Routine's sessions. Routines created through the API can't carry
+   connectors in this organization, so either turn Shopify and Asana on in the Routine's edit
+   page (claude.ai/code → Routines → Calimia nightly order tasks → connectors) or create the
+   Routine there from the prompt in `mods/calimia-order-desk/routines/nightly-orders.md`
+   (daily, midnight America/New_York, new session each run) and delete
+   `trig_014GEM4t4uueBSmdoiqcKYxz`. Then fire it once and check for the "Test run" comment on
+   the Asana task "Notes".
 2. **Turn off the old desktop nightly agent** (a scheduled task in the Claude desktop app) once
    the Routine works, so two agents do not write to the board at midnight.
 3. **First Order Desk run:** `/orders auto off`, `/orders`, read the waiting Asana updates

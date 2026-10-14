@@ -379,8 +379,10 @@ Eastern. If the market is closed, do everything except placement and schedule th
 placement for the next open session.
 
 **A. Preflight**
-1. Read `state/plan.md`, `state/decisions.md`, the last entry in `state/journal.md`,
-   `state/holdings.md`, `state/watchlist.md`, and any open ticket.
+1. Pull the latest commit of this repository first, so a session on another machine
+   cannot leave this one reading stale state. Then read `state/plan.md`,
+   `state/decisions.md`, the last entry in `state/journal.md`, `state/holdings.md`,
+   `state/watchlist.md`, and any open ticket.
 2. List accounts; confirm the Agentic account number matches `state/plan.md`.
 3. Fetch portfolio, positions, open orders, and cash. Note which cash is available.
 4. Reconcile positions and orders against `state/holdings.md`, `state/ledger.csv`, and
